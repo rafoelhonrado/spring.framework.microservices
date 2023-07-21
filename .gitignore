@@ -1,4 +1,6 @@
 /target/
+/bin/
+*/bin/**
 */target/**
 **/META-INF/
 

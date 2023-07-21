@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +14,7 @@ import com.vichamalab.order_service.dto.OrderItemRequest;
 import com.vichamalab.order_service.dto.OrderRequest;
 import com.vichamalab.order_service.entity.Order;
 import com.vichamalab.order_service.entity.OrderItem;
+import com.vichamalab.order_service.event.OrderPlacedEvent;
 import com.vichamalab.order_service.repository.OrderRepository;
 
 import brave.ScopedSpan;
@@ -29,6 +31,7 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final WebClient.Builder webClientBuilder;
 	private final Tracer tracer;
+	private final KafkaTemplate<String,OrderPlacedEvent> kafkaTemplate;
 
 	public String placeOrder(OrderRequest orderRequest) {
 		Order order = new Order();
@@ -52,6 +55,7 @@ public class OrderService {
 
 			if (result) {
 				orderRepository.save(order);
+				kafkaTemplate.send("notificationTopic",new OrderPlacedEvent( order.getOrderNumber()));
 				log.info("Order was placed sucessfully");
 				return "Order was placed sucessfully";
 			} else {

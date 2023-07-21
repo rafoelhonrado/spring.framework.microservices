@@ -47,6 +47,7 @@
 		<module>spring-order-microservice</module>
 		<module>spring-inventory-microservice</module>
 		<module>spring-gateway-microservice</module>
+		<module>spring-notification-microservice</module>
 	</modules>
 
 	<build>
